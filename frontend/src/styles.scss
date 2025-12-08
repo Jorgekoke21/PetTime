@@ -1,0 +1,74 @@
+/* Variables */
+$primary-color: #FF9F43;
+$secondary-color: #54A0FF;
+$text-color: #333;
+$bg-color: #F4F6F8;
+$card-radius: 20px;
+
+/* Reset & Base */
+body {
+  font-family: 'Nunito', sans-serif;
+  background-color: $bg-color;
+  color: $text-color;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  color: #2d3436;
+}
+
+/* Component Overrides */
+.btn {
+  border-radius: 50px; /* Pill shape for buttons */
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+
+  &-primary {
+    background-color: $primary-color;
+    border-color: $primary-color;
+    color: white;
+    
+    &:hover {
+      background-color: darken($primary-color, 10%);
+      border-color: darken($primary-color, 10%);
+    }
+  }
+
+  &-secondary {
+    background-color: $secondary-color;
+    border-color: $secondary-color;
+    color: white;
+
+    &:hover {
+        background-color: darken($secondary-color, 10%);
+        border-color: darken($secondary-color, 10%);
+      }
+  }
+}
+
+.card {
+  border-radius: $card-radius;
+  border: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+.form-control {
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e9ecef;
+  
+  &:focus {
+    border-color: $secondary-color;
+    box-shadow: 0 0 0 0.25rem rgba($secondary-color, 0.25);
+  }
+}
+
+/* Utils */
+.text-primary-custom { color: $primary-color !important; }
+.text-secondary-custom { color: $secondary-color !important; }
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, $primary-color 0%, #ffba73 100%);
+}
