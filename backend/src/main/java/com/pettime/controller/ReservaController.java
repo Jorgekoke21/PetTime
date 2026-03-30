@@ -9,8 +9,11 @@ import com.pettime.security.payload.ReservaRequest;
 import com.pettime.service.PagoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -73,5 +76,30 @@ public class ReservaController {
         pagoService.procesarPagoMock(request.getReservaId(), monto);
 
         return ResponseEntity.ok("Pago procesado exitosamente");
+    }
+
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<?> actualizarEstado(@PathVariable Long id,
+                                              @RequestParam("estado") EstadoReserva estado) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = userDetails.getUsername();
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Reserva reserva = reservaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
+
+        Long usuarioId = usuario.getId();
+        boolean esDueno = reserva.getDueno() != null && reserva.getDueno().getId().equals(usuarioId);
+        boolean esPaseador = reserva.getPaseador() != null && reserva.getPaseador().getId().equals(usuarioId);
+
+        if (!esDueno && !esPaseador) {
+            throw new AccessDeniedException("Acceso Denegado");
+        }
+
+        reserva.setEstado(estado);
+        reservaRepository.save(reserva);
+
+        return ResponseEntity.ok("Estado actualizado");
     }
 }

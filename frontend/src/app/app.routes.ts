@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth.guard';
+import { paseadorGuard } from './core/paseador.guard';
 
 export const routes: Routes = [
   { 
@@ -23,6 +24,11 @@ export const routes: Routes = [
     path: 'reservas', 
     loadComponent: () => import('./features/reservas/reserva-list/reserva-list.component').then(m => m.ReservaListComponent),
     canActivate: [authGuard]
+  },
+  { 
+    path: 'mi-perfil', 
+    loadComponent: () => import('./features/paseadores/profile-editor/profile-editor.component').then(m => m.ProfileEditorComponent),
+    canActivate: [authGuard, paseadorGuard]
   },
   {
     path: '**',

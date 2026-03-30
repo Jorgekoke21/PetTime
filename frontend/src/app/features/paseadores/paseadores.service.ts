@@ -12,4 +12,12 @@ export class PaseadoresService {
   getAll(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);
   }
+
+  getMiPerfil(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/me`);
+  }
+
+  updatePerfil(datos: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/me`, datos);
+  }
 }

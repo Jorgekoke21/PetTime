@@ -36,6 +36,11 @@ import { AuthService } from '../../core/auth.service';
               <li class="nav-item">
                 <a class="nav-link" routerLink="/reservas">Mis Reservas</a>
               </li>
+              @if (esPaseador) {
+                <li class="nav-item">
+                  <a class="nav-link" routerLink="/mi-perfil">Mi Perfil</a>
+                </li>
+              }
               <li class="nav-item ms-3">
                 <span class="fw-bold me-2">{{ authService.currentUserSig().username }}</span>
                 <button class="btn btn-sm btn-outline-danger" (click)="logout()">Salir</button>
@@ -49,6 +54,11 @@ import { AuthService } from '../../core/auth.service';
 })
 export class NavbarComponent {
   authService = inject(AuthService);
+
+  get esPaseador(): boolean {
+    const user = this.authService.currentUserSig();
+    return Array.isArray(user?.roles) && user.roles.includes('PASEADOR');
+  }
 
   logout() {
     this.authService.logout();

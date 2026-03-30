@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReservasService } from '../reservas.service';
+import { AuthService } from '../../../core/auth.service';
 
 @Component({
   selector: 'app-reserva-list',
@@ -32,22 +33,41 @@ import { ReservasService } from '../reservas.service';
                     <small class="text-muted">\${{ reserva.paseador?.precioPorHora }}</small>
                 </td>
                 <td>
-                  <span class="badge rounded-pill" 
+                  <span class="badge rounded-pill"
                     [ngClass]="{
-                        'bg-warning text-dark': reserva.estado === 'PENDIENTE', 
-                        'bg-success': reserva.estado === 'PAGADA',
-                        'bg-secondary': reserva.estado === 'FINALIZADA'
+                        'bg-warning text-dark': reserva.estado === 'PENDIENTE',
+                        'bg-primary': reserva.estado === 'CONFIRMADA',
+                        'bg-success': reserva.estado === 'COMPLETADA',
+                        'bg-danger': reserva.estado === 'CANCELADA',
+                        'bg-secondary': !['PENDIENTE','CONFIRMADA','COMPLETADA','CANCELADA'].includes(reserva.estado)
                     }">
                     {{ reserva.estado }}
                   </span>
                 </td>
                 <td>
                   @if (reserva.estado === 'PENDIENTE') {
-                    <button class="btn btn-success btn-sm rounded-pill px-3" (click)="pagar(reserva)">
-                      <i class="fas fa-credit-card me-1"></i> Pagar
-                    </button>
-                  } @else if (reserva.estado === 'PAGADA') {
-                     <span class="text-success"><i class="fas fa-check"></i> Listo</span>
+                    @if (esDueno) {
+                      <button class="btn btn-danger btn-sm rounded-pill px-3"
+                        (click)="cambiarEstado(reserva, 'CANCELADA')">
+                        Cancelar
+                      </button>
+                    } @else {
+                      <button class="btn btn-success btn-sm rounded-pill px-3 me-2"
+                        (click)="cambiarEstado(reserva, 'CONFIRMADA')">
+                        Confirmar
+                      </button>
+                      <button class="btn btn-danger btn-sm rounded-pill px-3"
+                        (click)="cambiarEstado(reserva, 'CANCELADA')">
+                        Rechazar
+                      </button>
+                    }
+                  } @else if (reserva.estado === 'CONFIRMADA') {
+                    @if (esPaseador) {
+                      <button class="btn btn-primary btn-sm rounded-pill px-3"
+                        (click)="cambiarEstado(reserva, 'COMPLETADA')">
+                        Completar / Finalizar
+                      </button>
+                    }
                   }
                 </td>
               </tr>
@@ -62,6 +82,7 @@ import { ReservasService } from '../reservas.service';
 })
 export class ReservaListComponent implements OnInit {
   reservasService = inject(ReservasService);
+  authService = inject(AuthService);
   reservas = signal<any[]>([]);
 
   ngOnInit() {
@@ -84,5 +105,24 @@ export class ReservaListComponent implements OnInit {
             error: () => alert('Error en el pago')
         });
     }
+  }
+
+  cambiarEstado(reserva: any, nuevoEstado: string) {
+    this.reservasService.cambiarEstado(reserva.id, nuevoEstado).subscribe({
+      next: () => {
+        alert('Estado actualizado');
+        this.cargarReservas();
+      },
+      error: () => alert('Error al actualizar el estado')
+    });
+  }
+
+  get esPaseador(): boolean {
+    const user = this.authService.currentUserSig();
+    return Array.isArray(user?.roles) && user.roles.includes('PASEADOR');
+  }
+
+  get esDueno(): boolean {
+    return !this.esPaseador;
   }
 }

@@ -26,8 +26,8 @@ public class PagoService {
         Reserva reserva = reservaRepository.findById(reservaId)
                 .orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
 
-        if (reserva.getEstado() == EstadoReserva.PAGADA) {
-            throw new RuntimeException("La reserva ya está pagada");
+        if (reserva.getEstado() == EstadoReserva.CONFIRMADA) {
+            throw new RuntimeException("La reserva ya está confirmada");
         }
 
         // Simular lógica de Stripe (siempre aprueba)
@@ -41,7 +41,7 @@ public class PagoService {
 
         // Actualizar reserva
         reserva.setPago(pago);
-        reserva.setEstado(EstadoReserva.PAGADA);
+        reserva.setEstado(EstadoReserva.CONFIRMADA);
         reservaRepository.save(reserva);
 
         return pago;

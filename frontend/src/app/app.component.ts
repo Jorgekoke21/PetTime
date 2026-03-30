@@ -13,7 +13,7 @@ import { NavbarComponent } from './shared/navbar/navbar.component';
       <router-outlet></router-outlet>
     </div>
     <footer class="text-center py-4 mt-5 text-muted">
-      <small>&copy; 2025 PetTime. Hecho con <i class="fas fa-heart text-danger"></i> para las mascotas.</small>
+      <small>&copy; 2025 PetTime</small>
     </footer>
   `
 })
