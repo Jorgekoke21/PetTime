@@ -8,74 +8,105 @@ import { AuthService } from '../../../core/auth.service';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="container py-4">
-      <h2 class="mb-4 text-secondary-custom">Mis Reservas</h2>
+    <div class="container py-4 py-lg-5">
+      <div class="listing-hero card border-0 p-4 p-lg-5 mb-4 listing-surface">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-8">
+            <span class="hero-badge mb-3 d-inline-flex align-items-center gap-2">
+              <i class="fas fa-calendar-alt"></i>
+              Gestión de reservas
+            </span>
+            <h2 class="mb-2 text-secondary-custom">Un panel más visual para tus paseos</h2>
+            <p class="text-muted mb-0">Consulta reservas como tarjetas, revisa estados y actúa con una interfaz mucho más clara.</p>
+          </div>
+          <div class="col-lg-4">
+            <div class="stats-inline d-flex gap-3 justify-content-lg-end">
+              <div class="mini-stat glass-pill">
+                <strong>{{ reservas().length }}</strong>
+                <span>Total</span>
+              </div>
+              <div class="mini-stat glass-pill">
+                <strong>{{ esPaseador ? 'P' : 'D' }}</strong>
+                <span>{{ esPaseador ? 'Paseador' : 'Dueño' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <div class="table-responsive">
-        <table class="table table-hover align-middle">
-          <thead class="table-light">
-            <tr>
-              <th>ID</th>
-              <th>Fecha/Hora</th>
-              <th>Paseador / Cliente</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (reserva of reservas(); track reserva.id) {
-              <tr>
-                <td>#{{ reserva.id }}</td>
-                <td>{{ reserva.fechaHoraReserva | date:'short' }}</td>
-                <td>
-                    <span class="fw-bold">{{ reserva.paseador?.nombre }}</span>
-                    <br>
-                    <small class="text-muted">\${{ reserva.paseador?.precioPorHora }}</small>
-                </td>
-                <td>
-                  <span class="badge rounded-pill"
-                    [ngClass]="{
-                        'bg-warning text-dark': reserva.estado === 'PENDIENTE',
-                        'bg-primary': reserva.estado === 'CONFIRMADA',
-                        'bg-success': reserva.estado === 'COMPLETADA',
-                        'bg-danger': reserva.estado === 'CANCELADA',
-                        'bg-secondary': !['PENDIENTE','CONFIRMADA','COMPLETADA','CANCELADA'].includes(reserva.estado)
-                    }">
-                    {{ reserva.estado }}
-                  </span>
-                </td>
-                <td>
+      <div class="row g-4">
+        @for (reserva of reservas(); track reserva.id) {
+          <div class="col-lg-6">
+            <article class="card reservation-card border-0 p-4 p-lg-4">
+              <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                <div>
+                  <small class="text-muted d-block mb-1">Reserva #{{ reserva.id }}</small>
+                  <h5 class="mb-0 fw-bold">{{ esPaseador ? reserva.dueno?.nombre : reserva.paseador?.nombre }}</h5>
+                </div>
+                <span class="badge rounded-pill px-3 py-2 status-pill"
+                  [ngClass]="{
+                    'bg-warning text-dark': reserva.estado === 'PENDIENTE',
+                    'bg-primary': reserva.estado === 'CONFIRMADA',
+                    'bg-success': reserva.estado === 'COMPLETADA',
+                    'bg-danger': reserva.estado === 'CANCELADA'
+                  }">
+                  {{ reserva.estado }}
+                </span>
+              </div>
+
+              <div class="reservation-meta-grid mb-4">
+                <div class="meta-box soft-panel">
+                  <span>Fecha</span>
+                  <strong>{{ reserva.fechaHoraReserva | date:'shortDate' }}</strong>
+                </div>
+                <div class="meta-box soft-panel">
+                  <span>Hora</span>
+                  <strong>{{ reserva.fechaHoraReserva | date:'shortTime' }}</strong>
+                </div>
+                <div class="meta-box soft-panel">
+                  <span>{{ esPaseador ? 'Cliente' : 'Servicio' }}</span>
+                  <strong>{{ esPaseador ? 'Paseo' : (reserva.paseador?.precioPorHora + ' € / h') }}</strong>
+                </div>
+              </div>
+
+              <div class="reservation-footer d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <small class="text-muted">{{ esPaseador ? 'Gestiona la solicitud recibida' : 'Consulta y controla tu reserva' }}</small>
+                <div class="d-flex flex-wrap gap-2 justify-content-md-end">
                   @if (reserva.estado === 'PENDIENTE') {
                     @if (esDueno) {
-                      <button class="btn btn-danger btn-sm rounded-pill px-3"
-                        (click)="cambiarEstado(reserva, 'CANCELADA')">
+                      <button class="btn btn-outline-danger btn-sm" (click)="cambiarEstado(reserva, 'CANCELADA')">
                         Cancelar
                       </button>
                     } @else {
-                      <button class="btn btn-success btn-sm rounded-pill px-3 me-2"
-                        (click)="cambiarEstado(reserva, 'CONFIRMADA')">
+                      <button class="btn btn-success btn-sm" (click)="cambiarEstado(reserva, 'CONFIRMADA')">
                         Confirmar
                       </button>
-                      <button class="btn btn-danger btn-sm rounded-pill px-3"
-                        (click)="cambiarEstado(reserva, 'CANCELADA')">
+                      <button class="btn btn-outline-danger btn-sm" (click)="cambiarEstado(reserva, 'CANCELADA')">
                         Rechazar
                       </button>
                     }
-                  } @else if (reserva.estado === 'CONFIRMADA') {
-                    @if (esPaseador) {
-                      <button class="btn btn-primary btn-sm rounded-pill px-3"
-                        (click)="cambiarEstado(reserva, 'COMPLETADA')">
-                        Completar / Finalizar
-                      </button>
-                    }
                   }
-                </td>
-              </tr>
-            } @empty {
-                <tr><td colspan="5" class="text-center py-4">No tienes reservas aún.</td></tr>
-            }
-          </tbody>
-        </table>
+
+                  @if (reserva.estado === 'CONFIRMADA' && esPaseador) {
+                    <button class="btn btn-primary btn-sm" (click)="cambiarEstado(reserva, 'COMPLETADA')">
+                      Completar
+                    </button>
+                  }
+                </div>
+              </div>
+            </article>
+          </div>
+        } @empty {
+          <div class="col-12">
+            <div class="card p-5 text-center empty-state-card reservation-empty-card">
+              <div class="empty-illustration mx-auto mb-3">
+                <i class="fas fa-calendar-xmark"></i>
+              </div>
+              <h4 class="mb-2">No tienes reservas todavía</h4>
+              <p class="mb-0 text-muted">Cuando reserves o recibas un paseo, aparecerá aquí con un formato más visual.</p>
+            </div>
+          </div>
+        }
       </div>
     </div>
   `
@@ -95,25 +126,13 @@ export class ReservaListComponent implements OnInit {
     });
   }
 
-  pagar(reserva: any) {
-    if(confirm(`¿Confirmar pago simulado de $${reserva.paseador.precioPorHora}?`)) {
-        this.reservasService.pagar(reserva.id).subscribe({
-            next: () => {
-                alert('Pago realizado con éxito');
-                this.cargarReservas();
-            },
-            error: () => alert('Error en el pago')
-        });
-    }
-  }
-
   cambiarEstado(reserva: any, nuevoEstado: string) {
     this.reservasService.cambiarEstado(reserva.id, nuevoEstado).subscribe({
       next: () => {
-        alert('Estado actualizado');
+        alert('Estado actualizado correctamente');
         this.cargarReservas();
       },
-      error: () => alert('Error al actualizar el estado')
+      error: (err) => alert(err?.error?.error || err?.error || 'Error al actualizar el estado')
     });
   }
 

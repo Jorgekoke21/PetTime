@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class PaseadoresService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/paseadores';
+  private apiUrl = 'http://localhost:8081/api/paseadores';
 
   getAll(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);

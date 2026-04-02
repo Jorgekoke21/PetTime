@@ -6,6 +6,7 @@ import com.pettime.model.entity.Rol;
 import com.pettime.model.entity.Usuario;
 import com.pettime.repository.PaseadorRepository;
 import com.pettime.repository.UsuarioRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.List;
 
 @RestController
@@ -42,7 +44,7 @@ public class PaseadorController {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         if (usuario.getRol() != Rol.PASEADOR) {
-            throw new AccessDeniedException("Acceso Denegado");
+            throw new AccessDeniedException("Acceso denegado");
         }
 
         Paseador paseador = paseadorRepository.findById(usuario.getId())
@@ -52,7 +54,7 @@ public class PaseadorController {
     }
 
     @PutMapping("/me")
-    public ResponseEntity<?> updateMiPerfil(@RequestBody PaseadorUpdateDTO updateDTO) {
+    public ResponseEntity<?> updateMiPerfil(@Valid @RequestBody PaseadorUpdateDTO updateDTO) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
         String email = userDetails.getUsername();
@@ -60,14 +62,14 @@ public class PaseadorController {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         if (usuario.getRol() != Rol.PASEADOR) {
-            throw new AccessDeniedException("Acceso Denegado");
+            throw new AccessDeniedException("Acceso denegado");
         }
 
         Paseador paseador = paseadorRepository.findById(usuario.getId())
                 .orElseThrow(() -> new RuntimeException("Paseador no encontrado"));
 
         if (updateDTO.getBiografia() != null) {
-            paseador.setBiografia(updateDTO.getBiografia());
+            paseador.setBiografia(updateDTO.getBiografia().trim());
         }
         if (updateDTO.getPrecioPorHora() != null) {
             paseador.setPrecioPorHora(updateDTO.getPrecioPorHora());

@@ -1,9 +1,22 @@
 package com.pettime.dto;
 
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Size;
+
 public class PaseadorUpdateDTO {
+    @Size(max = 500, message = "La biografía no puede superar los 500 caracteres")
     private String biografia;
+
+    @DecimalMin(value = "0.0", message = "El precio no puede ser negativo")
     private Double precioPorHora;
+
+    @DecimalMin(value = "-90.0", message = "Latitud no válida")
+    @DecimalMax(value = "90.0", message = "Latitud no válida")
     private Double latitud;
+
+    @DecimalMin(value = "-180.0", message = "Longitud no válida")
+    @DecimalMax(value = "180.0", message = "Longitud no válida")
     private Double longitud;
 
     public String getBiografia() {

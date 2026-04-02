@@ -12,50 +12,118 @@ import * as L from 'leaflet';
   imports: [CommonModule, FormsModule],
   styles: [`
     #modal-map {
-      height: 300px;
+      height: 320px;
       width: 100%;
-      border-radius: 10px;
+      border-radius: 24px;
     }
   `],
   template: `
-    <div class="container py-4">
-      <h2 class="mb-4 text-primary-custom">Encuentra tu Paseador Ideal</h2>
-      
-      <div class="row">
-        @for (paseador of paseadores(); track paseador.id) {
-          <div class="col-md-4 mb-4">
-            <div class="card h-100">
-              <div class="card-body text-center">
-                <div class="mb-3">
-                    <i class="fas fa-user-circle fa-4x text-secondary"></i>
-                </div>
-                <h5 class="card-title fw-bold">{{ paseador.nombre }}</h5>
-                <p class="card-text text-muted">{{ paseador.biografia }}</p>
-                <h6 class="text-success fw-bold">\${{ paseador.precioPorHora }} / hora</h6>
-
-                @if (paseador.latitud != null && paseador.longitud != null) {
-                  <button class="btn btn-outline-primary btn-sm mt-3"
-                    data-bs-toggle="modal" data-bs-target="#mapModal"
-                    (click)="seleccionarPaseador(paseador)">
-                    Ver ubicacion
-                  </button>
-                }
-                
-                <div class="mt-3 text-start bg-light p-3 rounded">
-                    <label class="small fw-bold mb-1">Reservar para:</label>
-                    <input type="datetime-local" class="form-control form-control-sm mb-2" [(ngModel)]="fechas[paseador.id]">
-                    <button class="btn btn-primary btn-sm w-100" 
-                        (click)="reservar(paseador.id)"
-                        [disabled]="!fechas[paseador.id]">
-                        Reservar Ahora
-                    </button>
-                </div>
+    <div class="container py-4 py-lg-5">
+      <div class="listing-hero card border-0 p-4 p-lg-5 mb-4 listing-surface">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-8">
+            <span class="hero-badge mb-3 d-inline-flex align-items-center gap-2">
+              <i class="fas fa-paw"></i>
+              Paseadores disponibles
+            </span>
+            <h2 class="text-primary-custom mb-2">Perfiles mejor presentados y mucho más visuales</h2>
+            <p class="text-muted mb-0">Ahora el listado se siente más editorial: más aire, mejor jerarquía y más diferencia entre bloques.</p>
+          </div>
+          <div class="col-lg-4">
+            <div class="stats-inline d-flex gap-3 justify-content-lg-end">
+              <div class="mini-stat glass-pill">
+                <strong>{{ paseadores().length }}</strong>
+                <span>Paseadores</span>
+              </div>
+              <div class="mini-stat glass-pill">
+                <strong>Top</strong>
+                <span>Selección visible</span>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div class="editorial-list d-flex flex-column gap-4">
+        @for (paseador of paseadores(); track paseador.id; let i = $index) {
+          <article class="card border-0 editorial-card p-4 p-lg-5">
+            <div class="row align-items-center g-4">
+              <div class="col-lg-3">
+                <div class="editorial-side h-100 d-flex flex-column justify-content-between">
+                  <div>
+                    <div class="editorial-avatar premium-avatar ring-avatar mb-3">
+                      <i class="fas fa-user"></i>
+                    </div>
+                    <span class="editorial-rank">Perfil {{ i + 1 }}</span>
+                    <h4 class="mt-3 mb-1">{{ paseador.nombre }}</h4>
+                    <small class="text-muted">Paseador profesional</small>
+                  </div>
+                  <div class="mt-4">
+                    <span class="rating-pill">⭐ {{ paseador.calificacion || 5.0 }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-5">
+                <div class="editorial-content">
+                  <h5 class="mb-3">Sobre este perfil</h5>
+                  <p class="text-muted editorial-bio mb-4">
+                    {{ paseador.biografia || 'Paseador disponible para ayudarte con tu mascota y ofrecer un paseo de calidad.' }}
+                  </p>
+
+                  <div class="editorial-tags d-flex flex-wrap gap-2">
+                    <span class="tech-pill">Reserva rápida</span>
+                    <span class="tech-pill">Ubicación visible</span>
+                    <span class="tech-pill">Perfil activo</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4">
+                <div class="editorial-panel highlighted-box h-100 d-flex flex-column justify-content-between">
+                  <div>
+                    <div class="detail-grid mb-3">
+                      <div class="detail-item soft-panel">
+                        <span>Precio</span>
+                        <strong>{{ paseador.precioPorHora }} € / h</strong>
+                      </div>
+                      <div class="detail-item soft-panel">
+                        <span>Valoración</span>
+                        <strong>{{ paseador.calificacion || 5.0 }}/5</strong>
+                      </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mb-3">
+                      @if (paseador.latitud != null && paseador.longitud != null) {
+                        <button class="btn btn-soft btn-sm"
+                          data-bs-toggle="modal" data-bs-target="#mapModal"
+                          (click)="seleccionarPaseador(paseador)">
+                          Ver ubicación
+                        </button>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="booking-box premium-booking mt-2">
+                    <label class="small fw-bold mb-2 d-block">Reservar para</label>
+                    <input type="datetime-local" class="form-control mb-3" [(ngModel)]="fechas[paseador.id]">
+                    <button class="btn btn-primary w-100"
+                      (click)="reservar(paseador.id)"
+                      [disabled]="!fechas[paseador.id]">
+                      Reservar ahora
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
         } @empty {
-          <div class="col-12 text-center">
-            <p>No hay paseadores disponibles en este momento.</p>
+          <div class="card p-5 text-center empty-state-card">
+            <div class="empty-illustration mx-auto mb-3">
+              <i class="fas fa-paw"></i>
+            </div>
+            <h4 class="mb-2">No hay paseadores disponibles</h4>
+            <p class="mb-0 text-muted">Prueba más tarde o revisa si el backend tiene datos cargados.</p>
           </div>
         }
       </div>
@@ -63,12 +131,15 @@ import * as L from 'leaflet';
 
     <div class="modal fade" id="mapModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Ubicacion del paseador</h5>
+        <div class="modal-content border-0 premium-modal">
+          <div class="modal-header border-0 pb-0">
+            <div>
+              <h5 class="modal-title mb-1">Ubicación del paseador</h5>
+              <small class="text-muted">{{ selectedPaseador?.nombre }}</small>
+            </div>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body">
+          <div class="modal-body pt-3">
             <div id="modal-map"></div>
           </div>
         </div>
@@ -80,12 +151,12 @@ export class PaseadorListComponent implements OnInit, AfterViewInit {
   paseadoresService = inject(PaseadoresService);
   reservasService = inject(ReservasService);
   router = inject(Router);
-  
+
   paseadores = signal<any[]>([]);
   fechas: { [key: number]: string } = {};
   private modalMap?: L.Map;
   private modalMarker?: L.Marker;
-  private selectedPaseador: any = null;
+  selectedPaseador: any = null;
   private customIcon = L.icon({
     iconUrl: 'https://cdn-icons-png.flaticon.com/512/91/91544.png',
     iconSize: [40, 40],
@@ -113,10 +184,10 @@ export class PaseadorListComponent implements OnInit, AfterViewInit {
 
     this.reservasService.crearReserva(paseadorId, fecha).subscribe({
       next: () => {
-        alert('Reserva creada exitosamente');
+        alert('Reserva creada correctamente');
         this.router.navigate(['/reservas']);
       },
-      error: () => alert('Error al reservar')
+      error: (err) => alert(err?.error?.error || err?.error || 'Error al reservar')
     });
   }
 
@@ -150,5 +221,4 @@ export class PaseadorListComponent implements OnInit, AfterViewInit {
 
     this.modalMap.invalidateSize();
   }
-
 }

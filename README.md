@@ -1,27 +1,61 @@
 # 🐾 PetTime
 
-Aplicación web para conectar dueños de mascotas con paseadores profesionales.
+PetTime es una aplicación web desarrollada como proyecto académico para conectar dueños de mascotas con paseadores profesionales.
 
-**Stack:** Angular 17 + Spring Boot 3 + MySQL
+## Tecnologías usadas
+- **Frontend:** Angular 17
+- **Backend:** Spring Boot 3
+- **Base de datos:** MySQL
+- **Seguridad:** JWT + BCrypt
 
----
+## Objetivo del proyecto
+El objetivo de PetTime es ofrecer una plataforma sencilla donde un usuario pueda registrarse, iniciar sesión, consultar paseadores, crear reservas y gestionar el estado de esas reservas. Además, los paseadores pueden editar su perfil para mostrar mejor su servicio.
 
-## 📋 Requisitos
+## Funcionalidades principales
+- Registro e inicio de sesión
+- Autenticación con JWT
+- Diferenciación básica de roles
+- Listado de paseadores
+- Visualización de ubicación en mapa
+- Creación y consulta de reservas
+- Actualización del estado de las reservas
+- Edición del perfil del paseador
+- Pago simulado
 
-Antes de empezar, instala:
+## Estructura del proyecto
+```text
+PetTime/
+├── backend/
+│   ├── src/main/java/com/pettime/
+│   │   ├── controller/
+│   │   ├── dto/
+│   │   ├── model/entity/
+│   │   ├── repository/
+│   │   ├── security/
+│   │   └── service/
+│   ├── src/main/resources/
+│   ├── Dockerfile
+│   └── TESTING.md
+│
+├── frontend/
+│   ├── src/app/
+│   │   ├── core/
+│   │   ├── features/
+│   │   └── shared/
+│   └── package.json
+│
+├── informe.md
+└── README.md
+```
 
-- **Node.js 18+** → [Descargar](https://nodejs.org/)
-- **Java JDK 21** → [Descargar](https://adoptium.net/)
-- **XAMPP** (MySQL) → [Descargar](https://www.apachefriends.org/)
-- **Git** → [Descargar](https://git-scm.com/)
+## Requisitos
+Antes de arrancar el proyecto hace falta tener instalado:
+- Node.js 18 o superior
+- Java JDK 21
+- MySQL o XAMPP
+- Git
 
-**IDEs recomendados:**
-- Frontend: VS Code
-- Backend: IntelliJ IDEA o Eclipse
-
----
-
-## 🚀 Instalación
+## Puesta en marcha
 
 ### 1. Clonar el repositorio
 ```bash
@@ -29,164 +63,80 @@ git clone https://github.com/Jorgekoke21/PetTime.git
 cd PetTime
 ```
 
----
+### 2. Configurar la base de datos
+Crear una base de datos llamada `pettime`.
 
-### 2. Configurar la Base de Datos
-
-**Con XAMPP:**
-
-1. Abre XAMPP Control Panel
-2. **Start** en MySQL (puerto 3307)
-3. Configura phpMyAdmin:
-   - Abre: `C:\xampp\phpMyAdmin\config.inc.php`
-   - Busca: `$cfg['Servers'][$i]['host'] = '127.0.0.1';`
-   - Agrega debajo: `$cfg['Servers'][$i]['port'] = '3307';`
-   - Guarda el archivo
-4. Abre phpMyAdmin: `http://localhost/phpmyadmin`
-5. Crea la base de datos: `pettime`
-
----
-
-### 3. Backend (Spring Boot)
-
-**Abrir en tu IDE:**
-- IntelliJ: `File → Open → backend`
-- Eclipse: `File → Import → Existing Maven Projects → backend`
-
-**Verificar configuración:**
-
-Abre: `backend/src/main/resources/application.properties`
-
-Si usas XAMPP (puerto 3307), debe decir:
+La configuración actual del backend espera MySQL en el puerto `3307`:
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3307/pettime?useSSL=false&serverTimezone=UTC
+spring.datasource.url=jdbc:mysql://localhost:3307/pettime?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
 spring.datasource.username=root
 spring.datasource.password=
 ```
 
-Si usas MySQL standalone (puerto 3306), cambia `3307` por `3306`.
+Si tu MySQL usa `3306`, tendrás que cambiar el puerto en `backend/src/main/resources/application.properties`.
 
-**Ejecutar:**
-- IntelliJ: Click derecho en `PetTimeApplication.java` → **Run**
-- Eclipse: Click derecho en proyecto → **Run As** → **Spring Boot App**
-- Terminal: `cd backend` → `mvn spring-boot:run`
-
-✅ Backend corriendo en: `http://localhost:8080`
-
----
-
-### 4. Frontend (Angular)
-
-**Desde terminal:**
+### 3. Arrancar el backend
+Desde la carpeta `backend`:
 ```bash
-cd frontend
+mvn spring-boot:run
+```
+
+Backend disponible en:
+```text
+http://localhost:8081
+```
+
+### 4. Arrancar el frontend
+Desde la carpeta `frontend`:
+```bash
 npm install
 npm start
 ```
 
-✅ Frontend corriendo en: `http://localhost:4200`
-
----
-
-## ✅ Verificar que funciona
-
-1. **Backend:** Ve a `http://localhost:8080` (verás error 401 o 404 = funciona ✅)
-2. **Frontend:** Ve a `http://localhost:4200` (verás la app)
-3. **Prueba:** Registra un usuario en `/register`
-
----
-
-## 📁 Estructura
-```
-PetTime/
-├── backend/          # Spring Boot (Java)
-│   └── src/main/
-│       ├── java/com/pettime/
-│       │   ├── controller/
-│       │   ├── model/
-│       │   ├── repository/
-│       │   ├── security/
-│       │   └── service/
-│       └── resources/
-│           └── application.properties
-│
-└── frontend/         # Angular
-    └── src/app/
-        ├── core/
-        └── features/
-            ├── auth/
-            ├── home/
-            ├── paseadores/
-            └── reservas/
+Frontend disponible en:
+```text
+http://localhost:4200
 ```
 
----
+## Usuarios y roles
+- **Dueño:** busca paseadores y crea reservas
+- **Paseador:** aparece en el listado y gestiona reservas
+- **Admin:** rol reservado para gestión más avanzada
 
-## 🔑 API Endpoints
-
-### Sin autenticación:
-- `POST /api/auth/signup` - Registrarse
-- `POST /api/auth/signin` - Login
-
-### Con autenticación:
-- `GET /api/paseadores` - Listar paseadores
-- `GET /api/paseadores/{id}` - Ver paseador
-- `POST /api/reservas` - Crear reserva
-
----
-
-## 🐛 Problemas Comunes
-
-**"Cannot connect to database"**
-- ✅ Verifica que MySQL esté corriendo
-- ✅ Revisa el puerto (3307 XAMPP / 3306 MySQL standalone)
-- ✅ Confirma que existe la base de datos `pettime`
-
-**"Port 8080 already in use"**
-- ✅ Cierra otros procesos en puerto 8080
-- O cambia en `application.properties`: `server.port=8081`
-
-**Error 401 en frontend**
-- ✅ Verifica que el backend esté corriendo
-- ✅ Revisa la consola del navegador (F12)
-
----
-
-## 👥 Colaboración
-
-**Para trabajar en una funcionalidad:**
-```bash
-# Crear rama
-git checkout -b feature/nombre-funcionalidad
-
-# Hacer cambios
-git add .
-git commit -m "Descripción"
-git push origin feature/nombre-funcionalidad
-
-# Crear Pull Request en GitHub
+## Testing
+Se ha preparado un documento con pruebas manuales de API y casos de uso en:
+```text
+backend/TESTING.md
 ```
 
-**Actualizar tu código:**
-```bash
-git checkout main
-git pull origin main
-```
+## Seguridad aplicada
+A nivel de MVP, el proyecto incluye:
+- contraseñas cifradas con BCrypt
+- autenticación basada en JWT
+- rutas protegidas en backend
+- control básico de acceso según rol
 
----
+## Despliegue
+Actualmente el proyecto está pensado para entorno local o académico. El repositorio incluye Dockerfile para el backend, pero para un despliegue completo haría falta preparar mejor:
+- contenedorización global
+- variables de entorno
+- proxy inverso
+- HTTPS
+- escalabilidad y monitorización
 
-## 📝 Roles
+## Estado actual
+El proyecto cubre correctamente el flujo principal del MVP, aunque todavía tiene margen de mejora en:
+- testing automatizado
+- seguridad más avanzada
+- despliegue completo
+- pulido visual y documentación final del TFG
 
-- **DUEÑO:** Busca paseadores, hace reservas (por defecto al registrarse)
-- **PASEADOR:** Aparece en listado, recibe reservas (marca "Quiero ser Paseador" al registrarte)
-- **ADMIN:** Gestión completa (crear manualmente en BD)
+## Archivos de apoyo para la entrega
+- `informe.md` → base de la memoria técnica
+- `ANEXOS.md` → diagramas y material de anexos
+- `backend/TESTING.md` → pruebas manuales
+- `ENTREGA_FINAL.md` → checklist final antes de entregar
+- `GUIA_DEFENSA.md` → ayuda rápida para exponer el proyecto
+- `ENTREGA_2_MEJORAS.md` → refuerzo técnico/documental para la segunda entrega
 
----
 
-## 📧 Contacto
-
-Cualquier duda, contacta al equipo de desarrollo.
-
----
-
-**Proyecto académico - 2025**

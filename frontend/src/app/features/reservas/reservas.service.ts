@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ReservasService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/reservas';
+  private apiUrl = 'http://localhost:8081/api/reservas';
 
   crearReserva(paseadorId: number, fechaHora: string): Observable<string> {
     return this.http.post(this.apiUrl, { paseadorId, fechaHora }, { responseType: 'text' });

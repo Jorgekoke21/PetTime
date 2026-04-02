@@ -1,54 +1,106 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card p-4">
-          <h3 class="text-center mb-4 text-secondary-custom">Crear Cuenta</h3>
-          
-          @if (isSuccessful) {
-            <div class="alert alert-success">Registro exitoso. <a href="/login">Inicia sesión ahora</a>.</div>
-          } @else if (errorMessage) {
-             <div class="alert alert-danger">{{ errorMessage }}</div>
-          }
+    <div class="container py-5 py-lg-6">
+      <div class="row justify-content-center g-4 g-lg-5 align-items-start">
+        <div class="col-lg-6">
+          <div class="card p-4 p-md-5 border-0 auth-card auth-card-main">
+            <span class="hero-badge mb-3 d-inline-flex align-items-center gap-2 w-fit">
+              <i class="fas fa-user-plus"></i>
+              Crea tu cuenta
+            </span>
+            <h2 class="mb-2 text-secondary-custom">Empieza en PetTime</h2>
+            <p class="text-muted mb-4">Regístrate como dueño o como paseador y entra en una experiencia más cuidada y visual.</p>
 
-          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-            <div class="mb-3">
-              <label class="form-label">Nombre Completo</label>
-              <input type="text" class="form-control" formControlName="nombre">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Email</label>
-              <input type="email" class="form-control" formControlName="email">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Contraseña</label>
-              <input type="password" class="form-control" formControlName="password">
-            </div>
-            
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="checkPaseador" formControlName="isPaseador">
-                <label class="form-check-label fw-bold text-primary-custom" for="checkPaseador">¡Quiero ser Paseador!</label>
-            </div>
-            
-            @if (registerForm.get('isPaseador')?.value) {
-                <div class="alert alert-info">
-                    Como paseador, te asignaremos una tarifa inicial y ubicación por defecto. Podrás editarlo luego.
-                </div>
+            @if (isSuccessful) {
+              <div class="alert alert-success rounded-4 auth-alert">
+                Registro exitoso.
+                <a routerLink="/login" class="fw-bold text-decoration-none">Inicia sesión ahora</a>.
+              </div>
+            } @else if (errorMessage) {
+              <div class="alert alert-danger rounded-4 auth-alert">{{ errorMessage }}</div>
             }
 
-            <div class="d-grid">
-              <button type="submit" class="btn btn-secondary btn-block" [disabled]="registerForm.invalid">Registrarse</button>
+            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Nombre completo</label>
+                <input type="text" class="form-control" formControlName="nombre" placeholder="Tu nombre">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Email</label>
+                <input type="email" class="form-control" formControlName="email" placeholder="tu@email.com">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Contraseña</label>
+                <input type="password" class="form-control" formControlName="password" placeholder="Mínimo 6 caracteres">
+              </div>
+
+              <div class="role-card mb-4 premium-role-card">
+                <div class="form-check m-0 d-flex align-items-start gap-2">
+                  <input type="checkbox" class="form-check-input mt-1" id="checkPaseador" formControlName="isPaseador">
+                  <label class="form-check-label fw-bold text-primary-custom" for="checkPaseador">
+                    Quiero registrarme como paseador
+                    <small class="text-muted d-block fw-normal mt-1">
+                      Aparecerás en el listado y podrás editar tu perfil para mostrar mejor tu servicio.
+                    </small>
+                  </label>
+                </div>
+              </div>
+
+              @if (registerForm.get('isPaseador')?.value) {
+                <div class="alert alert-info rounded-4 auth-alert">
+                  Tendrás precio inicial y ubicación por defecto, pero podrás cambiarlos desde tu perfil.
+                </div>
+              }
+
+              <div class="d-grid">
+                <button type="submit" class="btn btn-secondary btn-lg" [disabled]="registerForm.invalid">Crear cuenta</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card p-4 p-md-5 border-0 auth-side-card">
+            <div class="auth-side-header mb-4">
+              <span class="mini-dot"></span>
+              <small class="text-muted fw-semibold">Dos tipos de perfil</small>
             </div>
-          </form>
+
+            <div class="feature-strip premium-strip mb-3">
+              <i class="fas fa-dog text-primary-custom"></i>
+              <div>
+                <strong>Dueño</strong>
+                <p class="mb-0 text-muted">Busca paseadores, reserva paseos y consulta el estado de tus solicitudes.</p>
+              </div>
+            </div>
+
+            <div class="feature-strip premium-strip mb-3">
+              <i class="fas fa-person-walking text-success"></i>
+              <div>
+                <strong>Paseador</strong>
+                <p class="mb-0 text-muted">Aparece en el listado, edita tu perfil y gestiona reservas recibidas.</p>
+              </div>
+            </div>
+
+            <div class="feature-strip premium-strip">
+              <i class="fas fa-star text-warning"></i>
+              <div>
+                <strong>Interfaz más cuidada</strong>
+                <p class="mb-0 text-muted">Diseño más redondeado, tarjetas suaves y una estética más agradable.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -57,7 +109,7 @@ import { AuthService } from '../../../core/auth.service';
 export class RegisterComponent {
   fb = inject(FormBuilder);
   authService = inject(AuthService);
-  
+
   registerForm = this.fb.group({
     nombre: ['', [Validators.required, Validators.minLength(3)]],
     email: ['', [Validators.required, Validators.email]],
@@ -71,21 +123,21 @@ export class RegisterComponent {
   onSubmit() {
     if (this.registerForm.valid) {
       const { nombre, email, password, isPaseador } = this.registerForm.value;
-      
-      // Construcción manual del objeto JSON exacto que espera el Backend
+
       const signupRequest = {
         nombre: nombre,
         email: email,
         password: password,
-        rol: isPaseador ? ["paseador"] : []
+        rol: isPaseador ? ['paseador'] : []
       };
-      
+
       this.authService.register(signupRequest).subscribe({
         next: () => {
           this.isSuccessful = true;
+          this.errorMessage = '';
         },
         error: (err) => {
-          this.errorMessage = err.error.message || 'Error en el registro';
+          this.errorMessage = err?.error?.message || err?.error?.error || 'Error en el registro';
         }
       });
     }

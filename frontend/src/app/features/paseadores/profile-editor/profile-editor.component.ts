@@ -10,39 +10,90 @@ import * as L from 'leaflet';
   imports: [CommonModule, ReactiveFormsModule],
   styles: [`
     .map-container {
-      height: 300px;
+      height: 340px;
       width: 100%;
-      border-radius: 12px;
+      border-radius: 24px;
+      overflow: hidden;
     }
   `],
   template: `
-    <div class="container py-4">
-      <h2 class="mb-4 text-primary-custom">Editar Perfil de Paseador</h2>
+    <div class="container py-4 py-lg-5">
+      <div class="row g-4 g-lg-5 align-items-start">
+        <div class="col-lg-7">
+          <div class="card p-4 p-md-5 border-0 auth-card auth-card-main">
+            <span class="hero-badge mb-3 d-inline-flex align-items-center gap-2 w-fit">
+              <i class="fas fa-user-pen"></i>
+              Perfil de paseador
+            </span>
+            <h2 class="mb-2 text-primary-custom">Haz tu perfil más atractivo</h2>
+            <p class="text-muted mb-4">Cuida tu presentación, define mejor tu precio y ajusta la zona en la que ofreces paseos.</p>
 
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="card p-4">
-        <div class="mb-3">
-          <label class="form-label">Biografia</label>
-          <textarea class="form-control" rows="4" formControlName="biografia"></textarea>
+            <form [formGroup]="form" (ngSubmit)="onSubmit()">
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Biografía</label>
+                <textarea class="form-control" rows="5" formControlName="biografia" placeholder="Cuéntales a los dueños cómo trabajas, qué experiencia tienes y por qué pueden confiar en ti"></textarea>
+                <small class="text-muted">Máximo 500 caracteres.</small>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-semibold">Precio por hora (€)</label>
+                <input type="number" class="form-control" formControlName="precioPorHora" min="0" step="0.5">
+              </div>
+
+              <div class="mb-4 profile-map-card">
+                <label class="form-label fw-semibold">Ubicación aproximada</label>
+                <div id="map" class="map-container mt-2"></div>
+                <small class="text-muted d-block mt-2">Haz clic sobre el mapa para actualizar tu ubicación.</small>
+              </div>
+
+              <div class="d-grid">
+                <button class="btn btn-primary btn-lg" type="submit" [disabled]="form.invalid">Guardar cambios</button>
+              </div>
+
+              @if (successMessage) {
+                <div class="alert alert-success rounded-4 auth-alert mt-4 mb-0">{{ successMessage }}</div>
+              }
+
+              @if (errorMessage) {
+                <div class="alert alert-danger rounded-4 auth-alert mt-4 mb-0">{{ errorMessage }}</div>
+              }
+            </form>
+          </div>
         </div>
 
-        <div class="mb-3">
-          <label class="form-label">Precio por Hora</label>
-          <input type="number" class="form-control" formControlName="precioPorHora" min="0" step="0.5">
-        </div>
+        <div class="col-lg-5">
+          <div class="card p-4 p-md-5 border-0 auth-side-card">
+            <div class="auth-side-header mb-4">
+              <span class="mini-dot"></span>
+              <small class="text-muted fw-semibold">Consejos para destacar</small>
+            </div>
 
-        <div class="mb-3">
-          <label class="form-label">Ubicacion (click en el mapa)</label>
-          <div id="map" class="map-container"></div>
-        </div>
+            <div class="feature-strip premium-strip mb-3">
+              <i class="fas fa-circle-info text-primary-custom"></i>
+              <div>
+                <strong>Biografía clara y cercana</strong>
+                <p class="mb-0 text-muted">Explica tu experiencia, el tipo de mascotas con las que trabajas y tu estilo de paseo.</p>
+              </div>
+            </div>
 
-        <div class="d-grid">
-          <button class="btn btn-primary" type="submit" [disabled]="form.invalid">Guardar</button>
-        </div>
+            <div class="feature-strip premium-strip mb-3">
+              <i class="fas fa-euro-sign text-success"></i>
+              <div>
+                <strong>Precio coherente</strong>
+                <p class="mb-0 text-muted">Un precio bien planteado transmite mejor el valor del servicio.</p>
+              </div>
+            </div>
 
-        @if (successMessage) {
-          <div class="text-success mt-3">{{ successMessage }}</div>
-        }
-      </form>
+            <div class="feature-strip premium-strip">
+              <i class="fas fa-map-location-dot text-warning"></i>
+              <div>
+                <strong>Ubicación orientativa</strong>
+                <p class="mb-0 text-muted">No hace falta indicar una dirección exacta; basta una zona aproximada.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   `
 })
@@ -60,6 +111,7 @@ export class ProfileEditorComponent implements OnInit, AfterViewInit {
   });
 
   successMessage = '';
+  errorMessage = '';
 
   form = this.fb.group({
     biografia: ['', [Validators.maxLength(500)]],
@@ -83,7 +135,7 @@ export class ProfileEditorComponent implements OnInit, AfterViewInit {
         }
       },
       error: () => {
-        console.error('Error al cargar el perfil');
+        this.errorMessage = 'No se pudo cargar el perfil';
       }
     });
   }
@@ -115,11 +167,12 @@ export class ProfileEditorComponent implements OnInit, AfterViewInit {
 
     this.paseadoresService.updatePerfil(this.form.value).subscribe({
       next: () => {
-        this.successMessage = 'Datos actualizados correctamente';
+        this.successMessage = 'Perfil actualizado correctamente';
+        this.errorMessage = '';
       },
-      error: () => {
+      error: (err) => {
         this.successMessage = '';
-        console.error('Error al actualizar el perfil');
+        this.errorMessage = err?.error?.error || 'Error al actualizar el perfil';
       }
     });
   }

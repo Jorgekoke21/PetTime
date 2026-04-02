@@ -3,16 +3,16 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 
-const API_URL = 'http://localhost:8080/api/auth/';
+const API_URL = 'http://localhost:8081/api/auth/';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  
+
   currentUserSig: WritableSignal<any> = signal(null);
 
-  constructor(private http: HttpClient, private router: Router) { 
+  constructor(private http: HttpClient, private router: Router) {
     const user = localStorage.getItem('user');
     if (user) {
       this.currentUserSig.set(JSON.parse(user));
@@ -51,8 +51,8 @@ export class AuthService {
   saveUser(user: any): void {
     localStorage.setItem('user', JSON.stringify(user));
   }
-  
+
   isLoggedIn(): boolean {
-      return !!this.getToken();
+    return !!this.getToken();
   }
 }
