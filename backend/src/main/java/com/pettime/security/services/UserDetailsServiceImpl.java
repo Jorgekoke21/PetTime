@@ -14,10 +14,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     UsuarioRepository usuarioRepository;
 
+    private String normalizeEmail(String email) {
+        return email == null ? null : email.trim().toLowerCase();
+    }
+
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Usuario usuario = usuarioRepository.findByEmail(email)
+        String normalizedEmail = normalizeEmail(email);
+
+        Usuario usuario = usuarioRepository.findByEmail(normalizedEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found with email: " + email));
 
         return UserDetailsImpl.build(usuario);

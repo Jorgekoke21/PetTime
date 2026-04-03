@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
@@ -28,8 +29,10 @@ export class LoginComponent {
         next: () => {
           this.router.navigate(['/paseadores']);
         },
-        error: () => {
-          this.errorMessage = 'Credenciales inválidas';
+        error: (err: HttpErrorResponse) => {
+          this.errorMessage = err.status === 401
+            ? 'Email o contrase\u00f1a incorrectos'
+            : 'Error inesperado del servidor';
         }
       });
     }

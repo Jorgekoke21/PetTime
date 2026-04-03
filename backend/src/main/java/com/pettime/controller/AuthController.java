@@ -12,7 +12,9 @@ import com.pettime.security.payload.LoginRequest;
 import com.pettime.security.payload.SignupRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -43,30 +45,41 @@ public class AuthController {
     @Autowired
     JwtUtils jwtUtils;
 
+    private String normalizeEmail(String email) {
+        return email == null ? null : email.trim().toLowerCase();
+    }
+
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        String normalizedEmail = normalizeEmail(loginRequest.getEmail());
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(normalizedEmail, loginRequest.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtUtils.generateJwtToken(authentication);
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
-                .collect(Collectors.toList());
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            List<String> roles = userDetails.getAuthorities().stream()
+                    .map(item -> item.getAuthority())
+                    .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new JwtResponse(jwt,
-                userDetails.getId(),
-                userDetails.getUsername(),
-                userDetails.getEmail(),
-                roles));
+            return ResponseEntity.ok(new JwtResponse(jwt,
+                    userDetails.getId(),
+                    userDetails.getUsername(),
+                    userDetails.getEmail(),
+                    roles));
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
+        }
     }
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        if (usuarioRepository.existsByEmail(signUpRequest.getEmail())) {
+        String normalizedEmail = normalizeEmail(signUpRequest.getEmail());
+
+        if (usuarioRepository.existsByEmail(normalizedEmail)) {
             return ResponseEntity
                     .badRequest()
                     .body("Error: Email is already in use!");
@@ -88,7 +101,7 @@ public class AuthController {
         if (rol == Rol.PASEADOR) {
             Paseador paseador = new Paseador();
             paseador.setNombre(signUpRequest.getNombre());
-            paseador.setEmail(signUpRequest.getEmail());
+            paseador.setEmail(normalizedEmail);
             paseador.setPassword(encoder.encode(signUpRequest.getPassword()));
             paseador.setRol(rol);
             paseador.setPrecioPorHora(signUpRequest.getPrecioPorHora() != null ? signUpRequest.getPrecioPorHora() : 15.0);
@@ -107,7 +120,7 @@ public class AuthController {
         } else {
             Usuario usuario = new Usuario();
             usuario.setNombre(signUpRequest.getNombre());
-            usuario.setEmail(signUpRequest.getEmail());
+            usuario.setEmail(normalizedEmail);
             usuario.setPassword(encoder.encode(signUpRequest.getPassword()));
             usuario.setRol(rol);
             usuarioRepository.save(usuario);
