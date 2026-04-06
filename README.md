@@ -117,27 +117,10 @@ A nivel de MVP, el proyecto incluye:
 - rutas protegidas en backend
 - control básico de acceso según rol
 
-## Despliegue
-Actualmente el proyecto está pensado para entorno local o académico. El repositorio incluye Dockerfile para el backend, pero para un despliegue completo haría falta preparar mejor:
-- contenedorización global
-- variables de entorno
-- proxy inverso
-- HTTPS
-- escalabilidad y monitorización
 
-## Estado actual
-El proyecto cubre correctamente el flujo principal del MVP, aunque todavía tiene margen de mejora en:
-- testing automatizado
-- seguridad más avanzada
-- despliegue completo
-- pulido visual y documentación final del TFG
 
-## Archivos de apoyo para la entrega
-- `informe.md` → base de la memoria técnica
-- `ANEXOS.md` → diagramas y material de anexos
-- `backend/TESTING.md` → pruebas manuales
-- `ENTREGA_FINAL.md` → checklist final antes de entregar
-- `GUIA_DEFENSA.md` → ayuda rápida para exponer el proyecto
-- `ENTREGA_2_MEJORAS.md` → refuerzo técnico/documental para la segunda entrega
+
+
+
 
 
